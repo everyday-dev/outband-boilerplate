@@ -73,7 +73,10 @@ export default function BleScanList() {
                 renderItem={({ item }: { item: any }) => (
                     <Pressable
                         onPress={async () => {
-                            const connected = await bleConnect(item.id, 2500);
+                            const connected = await bleConnect(
+                                item.id,
+                                ProjectConfig.ble.deviceConnectTimeoutMs,
+                            );
                             if (connected)
                                 router.navigate({
                                     pathname: `/device/[deviceId]`,
