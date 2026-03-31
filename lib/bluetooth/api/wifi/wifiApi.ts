@@ -42,7 +42,9 @@ export const WifiApi = {
             provisioningTask(),
             timeoutMs,
             'Timeout writing WiFi credentials',
-        );
+        ).catch((error) => {
+            console.error('Failed to write WiFi Credentials: ' + error);
+        });
     },
 
     /**
