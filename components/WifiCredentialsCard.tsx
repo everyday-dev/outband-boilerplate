@@ -25,12 +25,18 @@ export default function WifiCredentialsCard() {
     const currentSsid = useBleNotify<string>(
         ProjectConfig.ble.services.wifi.service_uuid,
         ProjectConfig.ble.services.wifi.ssid_uuid,
+        {
+            defaultVal: 'N/A',
+        },
     );
     const wifiState = useBleNotify<number>(
         ProjectConfig.ble.services.wifi.service_uuid,
         ProjectConfig.ble.services.wifi.state_uuid,
-        (dat: Buffer) => {
-            return dat.readUint8(0);
+        {
+            parser: (dat: Buffer) => {
+                return dat.readUint8(0);
+            },
+            defaultVal: WifiState.WIFI_IDLE,
         },
     );
 

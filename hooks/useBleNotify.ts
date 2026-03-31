@@ -4,30 +4,39 @@ import { useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 
 /**
- * A reactive hook for subscribing to real-time BLE Characteristic notifications. On mount
- * the hook will attempt to hydrate via a Characteristic read. If 'Read' is unsupported,
- * the state remains null until the first notification.
- * @param serviceUUID - The UUID of the service containing the characteristic.
+ * Configuration options for the useBleNotify hook.
+ */
+interface BleNotifyOptions<T> {
+    /** A transform function to convert the incoming Buffer into the desired type T. */
+    parser?: (decodedData: Buffer) => T;
+    /** The sampling factor used to reduce UI updates (e.g., 10 updates only every 10th sample). */
+    decimate?: number;
+    /** A value used to initialize state if the device read fails or before the first notification. */
+    defaultVal?: T;
+}
+
+/**
+ * A reactive hook for subscribing to real-time BLE Characteristic notifications.
+ * * On mount, the hook attempts to hydrate state via a Characteristic read. If the read
+ * fails, it falls back to the provided defaultVal. It then listens for incoming
+ * notifications, applying decimation to throttle high-frequency updates.
+ * * @param serviceUUID - The UUID of the BLE service.
  * @param charUUID - The UUID of the characteristic to observe.
- * @param parser - A transform function to convert the incoming data into your desired type. Defaults to parsing incoming data
- * as a string
- * @param decimate - The sampling factor used to reduce the frequency of UI updates.
- * If a peripheral sends data at a high frequency (e.g., every 10ms), providing
- * a decimate value of `10` will cause the hook to only update the `data` state
- * every 10th sample (approx. every 100ms). This is highly recommended for telemetry
- * data to prevent "State Flooding," where the React render cycle cannot keep up with the
- * incoming BLE events.
- * @returns The most recent value emitted by the peripheral, or null if no
- * data has been received/read yet.
+ * @param options - Configuration for parsing, throttling, and default state.
+ * @returns The most recent parsed value, or null if no data is available.
  */
 export function useBleNotify<T = string>(
     serviceUUID: string,
     charUUID: string,
-    parser: (decodedData: Buffer) => T = (buf) =>
-        buf.toString('utf8') as unknown as T,
-    decimate: number = 1,
+    options: BleNotifyOptions<T> = {},
 ) {
-    const [data, setData] = useState<T | null>(null);
+    const {
+        decimate = 1,
+        defaultVal,
+        parser = (buf: Buffer) => buf.toString('utf8') as unknown as T,
+    } = options;
+
+    const [data, setData] = useState<T | null>(defaultVal ?? null);
     const counterRef = useRef<number>(0);
 
     useEffect(() => {
@@ -41,9 +50,13 @@ export function useBleNotify<T = string>(
                     setData(parser(rawBuffer));
                 }
             } catch (err) {
-                // Swallow the error. This would likely happen if we
-                // tried to read a characteristic that didn't have a READ property
-                // and is only set to NOTIFY
+                if (isMounted && defaultVal !== undefined) {
+                    setData(defaultVal);
+                } else if (isMounted) {
+                    console.warn(
+                        `useBleNotify: Failed to hydrate ${charUUID} and no defaultVal was provided.`,
+                    );
+                }
             }
         };
 
@@ -73,7 +86,7 @@ export function useBleNotify<T = string>(
             listener.remove();
             bleCore.stopStreaming(charUUID);
         };
-    }, [serviceUUID, charUUID]);
+    }, [serviceUUID, charUUID, decimate, defaultVal]);
 
     return data;
 }
