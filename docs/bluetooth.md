@@ -68,21 +68,54 @@ At the moment two use cases are covered for notification data
 
 ### useBleNotify
 
-`useBleNotify` is great for infrequent status updates like a device state or temperature values. A basic use would look like the snippet below where we are subscribing to notifications on the provided service/characteristic which should be returning a number indicating the current temperature.
+`useBleNotify` is a reactive hook designed for subscribing to real-time BLE Characteristic notifications. It is ideal for telemetry, sensor data (like temperature), or status updates.
 
-One important thing to note is that a `parser` function must be provided to parse the actual payload sent by the device. By default, if no parser is provided, the hook will attempt to parse all notified data as a `string`. In our example a `uint8` was provided via the payload. Other examples might be that the data is shared via a JSON object, or CBOR encoded in which you can use the necessary functions or libraries to parse your payload and return a `number` to use in your component (`currentTemp`)
+#### Initialization & Hydration
 
-```tsx
+On component mount, the hook automatically attempts to hydrate its state by performing an initial read of the characteristic. This ensures the UI displays the current device state immediately upon navigation. If the initial read fails (e.g., the characteristic does not support "Read" operations), the state initializes to the provided defaultVal.
+
+#### Throttling with Decimation
+
+If a peripheral sends data at a high frequency (e.g., an ECG sensor sending data every 10ms), providing a decimate value will prevent "State Flooding." A decimate value of 10 will cause the hook to only update the React data state every 10th sample (approx. every 100ms), significantly reducing the render load on the mobile device while maintaining a smooth data stream.
+
+#### Parameters
+
+The hook accepts an optional options object to customize data processing and update frequency:
+
+`parser`: A transform function to convert the incoming Buffer into your desired type T. If omitted, data is parsed as a UTF-8 string.
+
+`defaultVal`: A value used to initialize state if the device read fails or before the first notification arrives. Note that 0 and false are valid default values.
+
+`decimate`: A sampling factor used to reduce the frequency of UI updates. Defaults to 1.
+
+#### Usage Example
+
+In the example below, we subscribe to a thermostat's temperature characteristic. We provide a parser to read a uint8 from the buffer and set a default value of 65.
+
+```ts
 const currentTemp = useBleNotify<number>(
     ProjectConfig.ble.services.thermostat.service_uuid,
     ProjectConfig.ble.services.thermostat.current_temp_uuid,
-    (dat: Buffer) => {
-        return dat.readUint8(0);
+    {
+        parser: (dat: Buffer) => dat.readUint8(0),
+        defaultVal: 65,
     },
 );
 ```
 
-Finally, if a device sends data via notifications at a higher rate than you need for a given component, you can provide a `decimate` configuration which throws away received data and only updates the state every `N` samples. This can help to reduce visual jitter in a component and remove unnecessary component updates.
+Advanced Usage: High-Frequency Telemetry
+For high-speed data where the UI only needs to reflect a general trend rather than every single data point, you can increase the decimation factor:
+
+```ts
+const heartRate = useBleNotify<number>(
+    ProjectConfig.ble.services.ecg.service_uuid,
+    ProjectConfig.ble.services.ecg.bpm_uuid,
+    {
+        parser: (dat: Buffer) => dat.readUint8(0),
+        decimate: 5, // UI updates once every 5 notifications
+    },
+);
+```
 
 ### useBleStream
 

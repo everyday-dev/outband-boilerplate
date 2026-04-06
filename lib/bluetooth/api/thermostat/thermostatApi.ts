@@ -25,7 +25,12 @@ export const ThermostatApi = {
             sendSetpoint(),
             timeoutMs,
             'Timeout sending Thermostat Setpoint',
-        );
+        ).catch((error) => {
+            console.error(
+                'Failed to write to Thermostat Setpoint characteristic: ' +
+                    error,
+            );
+        });
     },
 
     /**
@@ -49,7 +54,11 @@ export const ThermostatApi = {
             sendState(),
             timeoutMs,
             'Timeout sending Thermostat State',
-        );
+        ).catch((error) => {
+            console.error(
+                'Failed to write to Thermostat State characteristic: ' + error,
+            );
+        });
     },
 
     /**

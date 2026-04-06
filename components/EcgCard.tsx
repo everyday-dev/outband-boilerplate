@@ -41,7 +41,10 @@ export default function EcgCard() {
     const heartRate = useBleNotify<number>(
         ProjectConfig.ble.services.ecg.service_uuid,
         ProjectConfig.ble.services.ecg.bpm_uuid,
-        (buf) => buf.readUInt8(0),
+        {
+            parser: (buf) => buf.readUInt8(0),
+            defaultVal: 60,
+        },
     );
 
     const styles = useMemo(

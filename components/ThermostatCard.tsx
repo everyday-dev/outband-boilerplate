@@ -27,22 +27,31 @@ export default function ThermostatCard() {
     const thermostatSetpoint = useBleNotify<number>(
         ProjectConfig.ble.services.thermostat.service_uuid,
         ProjectConfig.ble.services.thermostat.setpoint_uuid,
-        (dat: Buffer) => {
-            return dat.readUint8(0);
+        {
+            parser: (dat: Buffer) => {
+                return dat.readUint8(0);
+            },
+            defaultVal: 65,
         },
     );
     const currentTemp = useBleNotify<number>(
         ProjectConfig.ble.services.thermostat.service_uuid,
         ProjectConfig.ble.services.thermostat.current_temp_uuid,
-        (dat: Buffer) => {
-            return dat.readUint8(0);
+        {
+            parser: (dat: Buffer) => {
+                return dat.readUint8(0);
+            },
+            defaultVal: 70,
         },
     );
     const thermostatState = useBleNotify<ThermostatState>(
         ProjectConfig.ble.services.thermostat.service_uuid,
         ProjectConfig.ble.services.thermostat.state_uuid,
-        (dat: Buffer) => {
-            return dat.readUint8(0);
+        {
+            parser: (dat: Buffer) => {
+                return dat.readUint8(0);
+            },
+            defaultVal: ThermostatState.THERMOSTAT_OFF,
         },
     );
 
