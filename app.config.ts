@@ -14,11 +14,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 
     ios: {
         supportsTablet: true,
-        bundleIdentifier: 'boilerplate.outband',
+        bundleIdentifier: 'com.yourcompany.yourapp',
     },
 
     android: {
-        package: 'boilerplate.outband',
+        package: 'com.yourcompany.yourapp',
         adaptiveIcon: {
             backgroundColor: '#FFFFFF',
             foregroundImage: './assets/images/adaptive-icon.png',
