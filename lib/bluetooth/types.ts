@@ -60,8 +60,9 @@ export interface IBleCore {
      * Attempts a BLE connection to the deviceId provided and discovers its services and characteristics.
      * @param deviceId: Unique ID (MAC address on Android, UUID on iOS) of the device you want to connec to
      * @param timeoutMs Maximum time to wait for the connection before aborting..
+     * @param mtu Requested MTU for the new connection.
      */
-    connect(deviceId: string, timeoutMs: number): Promise<boolean>;
+    connect(deviceId: string, timeoutMs: number, mtu: number): Promise<boolean>;
 
     /**
      * Disconnects the active Device. Internal Disconnect handler will also cleanup any active streams

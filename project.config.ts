@@ -3,6 +3,7 @@ export const ProjectConfig = {
         useMockService: false,
     },
     ble: {
+        requestedMtu: 247,
         deviceConnectTimeoutMs: 5000,
         scanTimeoutMs: 5000,
         services: {

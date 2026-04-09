@@ -1,4 +1,3 @@
-import { withTimeout } from '@/lib/withTimeout';
 import { Buffer } from 'buffer';
 import { DeviceEventEmitter, PermissionsAndroid, Platform } from 'react-native';
 import { BleManager, Device, Subscription, UUID } from 'react-native-ble-plx';
@@ -103,13 +102,14 @@ export class BleCore implements IBleCore {
     public async connect(
         deviceId: string,
         timeoutMs: number = 2500,
+        mtu: number = 23,
     ): Promise<boolean> {
         if (!this.manager) {
             throw new Error('BLE Manager not initialized.');
         }
 
-        const connectTask = this.manager
-            .connectToDevice(deviceId)
+        return await this.manager
+            .connectToDevice(deviceId, { timeout: timeoutMs, requestMTU: mtu })
             .then(async (device) => {
                 await device.discoverAllServicesAndCharacteristics();
 
@@ -120,15 +120,10 @@ export class BleCore implements IBleCore {
                 DeviceEventEmitter.emit('ble-connection-change', true);
 
                 return true;
+            })
+            .catch((err) => {
+                throw new Error(`Failed to connect to device: ${err}`);
             });
-
-        return await withTimeout(
-            connectTask,
-            timeoutMs,
-            'Timeout connecting to device.',
-        ).catch((error) => {
-            return false;
-        });
     }
 
     public disconnect() {

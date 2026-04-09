@@ -104,6 +104,7 @@ export class BleCoreMock implements IBleCore {
     public connect(
         deviceId: string,
         timeoutMs: number = 2500,
+        mtu: number = 23,
     ): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
