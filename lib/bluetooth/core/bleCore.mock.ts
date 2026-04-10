@@ -101,6 +101,10 @@ export class BleCoreMock implements IBleCore {
         return this.connectedDevice ? [] : null;
     }
 
+    public getConnectionMTU(): number | null {
+        return this.connectedDevice ? ProjectConfig.ble.requestedMtu : null;
+    }
+
     public connect(
         deviceId: string,
         timeoutMs: number = 2500,

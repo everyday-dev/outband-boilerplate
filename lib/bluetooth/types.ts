@@ -42,19 +42,26 @@ export interface IBleCore {
     isDeviceConnected(): Promise<boolean>;
 
     /**
-     * Retrieves the last known Received Signal Strength Indicator (RSSI) of the selected device.
+     * Retrieves the last known Received Signal Strength Indicator (RSSI) of the connected device.
      * This value represents the signal strength in dBm (e.g., -45 is strong, -90 is weak).
-     * * @returns {number | null} The RSSI value, or null if no device is currently selected.
+     * * @returns {number | null} The RSSI value, or null if no device is currently connected.
      */
     getDeviceRssi(): number | null;
 
     /**
-     * Retrieves the list of Service UUIDs associated with the currently selected device.
+     * Retrieves the list of Service UUIDs associated with the currently connected device.
      * Note: This array is populated from the device's advertisement data during scanning,
      * or fully populated after explicitly discovering the device's services.
-     * @returns {UUID[] | null} An array of Service UUID strings, or null if no device is selected.
+     * @returns {UUID[] | null} An array of Service UUID strings, or null if no device is connected.
      */
     getDeviceServiceUUIDs(): UUID[] | null;
+
+    /**
+     * Retrieves the negotatiated MTU size for the connection. This value could be lower than
+     * the inital requested MTU based on the devices capabilities and settings.
+     * * @returns {number | null} The MTU value, or null if no device is currently connected.
+     */
+    getConnectionMTU(): number | null;
 
     /**
      * Attempts a BLE connection to the deviceId provided and discovers its services and characteristics.

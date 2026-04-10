@@ -99,6 +99,10 @@ export class BleCore implements IBleCore {
         return this.connectedDevice ? this.connectedDevice.serviceUUIDs : null;
     }
 
+    public getConnectionMTU(): number | null {
+        return this.connectedDevice ? this.connectedDevice.mtu : null;
+    }
+
     public async connect(
         deviceId: string,
         timeoutMs: number = 2500,
