@@ -7,6 +7,11 @@ export const ProjectConfig = {
         deviceConnectTimeoutMs: 5000,
         scanTimeoutMs: 5000,
         services: {
+            nus: {
+                service_uuid: '6e400001-b5a3-f393-e0a9-e50e24dcca9e',
+                uart_rx: '6e400002-b5a3-f393-e0a9-e50e24dcca9e',
+                uart_tx: '6e400003-b5a3-f393-e0a9-e50e24dcca9e',
+            },
             wifi: {
                 service_uuid: '4fafc201-1fb5-459e-8fcc-c5c9c331914b',
                 ssid_uuid: 'beb5483e-36e1-4688-b7f5-ea07361b26a8',
