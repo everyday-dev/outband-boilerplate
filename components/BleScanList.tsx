@@ -76,6 +76,7 @@ export default function BleScanList() {
                             const connected = await bleConnect(
                                 item.id,
                                 ProjectConfig.ble.deviceConnectTimeoutMs,
+                                ProjectConfig.ble.requestedMtu,
                             );
                             if (connected)
                                 router.navigate({

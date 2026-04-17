@@ -1,4 +1,5 @@
 import EcgCard from '@/components/EcgCard';
+import NUSCard from '@/components/NUSCard';
 import ThermostatCard from '@/components/ThermostatCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -99,6 +100,7 @@ export default function DeviceDetailsScreen() {
                         </CardFooter>
                     )}
                 </Card>
+                {isBleConnected && <NUSCard />}
                 {isBleConnected && <WifiCredentialsCard />}
                 {isBleConnected && <ThermostatCard />}
                 {isBleConnected && <EcgCard />}

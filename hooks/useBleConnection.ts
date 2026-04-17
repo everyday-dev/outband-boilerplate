@@ -39,13 +39,19 @@ export function useBleConnection() {
      * @param deviceId - The unique identifier of the target device.
      * @param timeoutMs - Maximum time (ms) to wait for the handshake and
      * service discovery before failing. Defaults to 2500ms.
+     * @param mtu - Requested MTU for the new connection
      */
     const bleConnect = useCallback(
-        async (deviceId: string, timeoutMs: number = 2500) => {
+        async (
+            deviceId: string,
+            timeoutMs: number = 2500,
+            mtu: number = 23,
+        ) => {
             setIsBleConnecting(true);
             try {
-                return await bleCore.connect(deviceId, timeoutMs);
+                return await bleCore.connect(deviceId, timeoutMs, mtu);
             } catch (error) {
+                console.warn(error);
                 return false;
             } finally {
                 setIsBleConnecting(false);

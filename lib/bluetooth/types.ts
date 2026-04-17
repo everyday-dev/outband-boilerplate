@@ -42,26 +42,34 @@ export interface IBleCore {
     isDeviceConnected(): Promise<boolean>;
 
     /**
-     * Retrieves the last known Received Signal Strength Indicator (RSSI) of the selected device.
+     * Retrieves the last known Received Signal Strength Indicator (RSSI) of the connected device.
      * This value represents the signal strength in dBm (e.g., -45 is strong, -90 is weak).
-     * * @returns {number | null} The RSSI value, or null if no device is currently selected.
+     * * @returns {number | null} The RSSI value, or null if no device is currently connected.
      */
     getDeviceRssi(): number | null;
 
     /**
-     * Retrieves the list of Service UUIDs associated with the currently selected device.
+     * Retrieves the list of Service UUIDs associated with the currently connected device.
      * Note: This array is populated from the device's advertisement data during scanning,
      * or fully populated after explicitly discovering the device's services.
-     * @returns {UUID[] | null} An array of Service UUID strings, or null if no device is selected.
+     * @returns {UUID[] | null} An array of Service UUID strings, or null if no device is connected.
      */
     getDeviceServiceUUIDs(): UUID[] | null;
+
+    /**
+     * Retrieves the negotatiated MTU size for the connection. This value could be lower than
+     * the inital requested MTU based on the devices capabilities and settings.
+     * * @returns {number | null} The MTU value, or null if no device is currently connected.
+     */
+    getConnectionMTU(): number | null;
 
     /**
      * Attempts a BLE connection to the deviceId provided and discovers its services and characteristics.
      * @param deviceId: Unique ID (MAC address on Android, UUID on iOS) of the device you want to connec to
      * @param timeoutMs Maximum time to wait for the connection before aborting..
+     * @param mtu Requested MTU for the new connection.
      */
-    connect(deviceId: string, timeoutMs: number): Promise<boolean>;
+    connect(deviceId: string, timeoutMs: number, mtu: number): Promise<boolean>;
 
     /**
      * Disconnects the active Device. Internal Disconnect handler will also cleanup any active streams
